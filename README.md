@@ -33,6 +33,6 @@ We use the expert trajectories by using the code given by [openai/imitation](htt
     
 ### Run.
 ```bash
-python run.py 
+python run.py --env Hopper-v1 --alg gail --num_expert_trajs 4
 ``` 
 will run BGAIL in default setting (see `bgail/defaults.py`.)
