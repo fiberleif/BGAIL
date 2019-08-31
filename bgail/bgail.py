@@ -89,7 +89,7 @@ def traj_segment_generator(pi, env, horizon, stochastic, render=False):
         t += 1
 
 
-def expert_traj_segment_generator(env, expert_trajs_path, timesteps_per_batch, num_expert_trajs):
+def expert_traj_segment_generator(env, expert_trajs_path, data_subsample_freq, timesteps_per_batch, num_expert_trajs):
     env_id = env.env.spec.id
     env_name = env_id.split('-')[0]
     if env_name not in ['Hopper', 'Walker2d', 'HalfCheetah', 'Ant', 'Humanoid',
@@ -99,6 +99,15 @@ def expert_traj_segment_generator(env, expert_trajs_path, timesteps_per_batch, n
     path = os.path.join(expert_trajs_path, 'trajs_'+env_name.lower()+'.pkl')
     with open(path, 'rb') as f:
         expert_trajs = pickle.load(f)[0:num_expert_trajs]
+
+    subsamples_num = 0
+    for idx in range(expert_trajs.shape[0]):
+        start = np.random.randint(0, data_subsample_freq)
+        ep_len = expert_trajs[idx]["ob"].shape[0]
+        expert_trajs[idx]["ob"] = expert_trajs[idx]["ob"][start:ep_len:data_subsample_freq, :]
+        expert_trajs[idx]["ac"] = expert_trajs[idx]["ac"][start:ep_len:data_subsample_freq, :]
+        subsamples_num += expert_trajs[idx]["ob"].shape[0]
+    print("After subsample, demo dataset size = {}".format(subsamples_num))
 
     obs, acs, ep_lens, ep_true_rets = [], [], [], []
     i = 0
@@ -152,6 +161,7 @@ def learn(*,
           vf_iters =3,
           expert_trajs_path='./expert_trajs',
           num_expert_trajs=500,
+          data_subsample_freq=20,
           g_step=1,
           d_step=1,
           classifier_entcoeff=1e-3,
@@ -336,7 +346,7 @@ def learn(*,
         seg_gen = traj_segment_generator(pi, env, 1, stochastic=False, render=render)
     else:
         seg_gen = traj_segment_generator(pi, env, timesteps_per_batch, stochastic=True, render=render)
-    seg_gen_e = expert_traj_segment_generator(env, expert_trajs_path, timesteps_per_batch, num_expert_trajs)
+    seg_gen_e = expert_traj_segment_generator(env, expert_trajs_path, data_subsample_freq, timesteps_per_batch, num_expert_trajs)
 
     episodes_so_far = 0
     timesteps_so_far = 0

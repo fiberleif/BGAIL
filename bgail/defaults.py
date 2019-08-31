@@ -104,6 +104,7 @@ def mujoco_gail():
         vf_iters=5,
         expert_trajs_path='./expert_trajs',
         num_expert_trajs=25,
+        data_subsample_freq=20,
         g_step=1,
         d_step=5,
         classifier_entcoeff=1e-3,
