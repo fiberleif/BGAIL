@@ -101,7 +101,7 @@ def expert_traj_segment_generator(env, expert_trajs_path, data_subsample_freq, t
         expert_trajs = pickle.load(f)[0:num_expert_trajs]
 
     subsamples_num = 0
-    for idx in range(expert_trajs.shape[0]):
+    for idx in range(len(expert_trajs)):
         start = np.random.randint(0, data_subsample_freq)
         ep_len = expert_trajs[idx]["ob"].shape[0]
         expert_trajs[idx]["ob"] = expert_trajs[idx]["ob"][start:ep_len:data_subsample_freq, :]
