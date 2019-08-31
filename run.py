@@ -50,7 +50,7 @@ def train(args, extra_args):
     alg_kwargs.update(extra_args)
 
     env = build_env(args)
-    logger.configure(os.path.join("log", "GAIL", args.env, "subsample_1",
+    logger.configure(os.path.join("log", "GAIL", args.env, "subsample_{}".format(extra_args["data_subsample_freq"]),
                                   "traj_{}".format(extra_args["num_expert_trajs"]), "seed_{}".format(args.seed)))
 
     print('Training {} on {}:{} with arguments \n{}'.format(args.alg, env_type, env_id, alg_kwargs))
